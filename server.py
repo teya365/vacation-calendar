@@ -4,13 +4,13 @@ import os
 
 app = Flask(__name__)
 
-API_URL = "https://script.google.com/macros/s/AKfycbxN4e2qVbIw5m3FLkaVVb8_mzj3vdtxQCGGloC0n7s_4b7ud1HxfoK_7zmYvPM_DCmi/exec"
+API_URL = "https://script.google.com/macros/s/AKfycbyrUQjHLgpo6aminWudHWfbR3eztVV1ehUpPYAIGGC7CtHwhTGqf6TIc27PYE4Qv-55/exec"
 
 @app.route('/')
 def home():
     return send_from_directory('.', 'index.html')
 
-# ✅ 데이터 추가 (구글시트 저장)
+# ✅ 데이터 추가
 @app.route('/add', methods=['POST'])
 def add():
     data = request.json
