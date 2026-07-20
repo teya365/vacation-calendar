@@ -5,7 +5,6 @@
 <title>휴가 달력</title>
 <style>
 body { font-family: sans-serif; }
-
 table { border-collapse: collapse; }
 td, th {
   border: 1px solid #ccc;
@@ -15,10 +14,7 @@ td, th {
   padding: 5px;
 }
 th { background: #f0f0f0; }
-
 .day { font-weight: bold; }
-
-/* 색상 */
 .연차 { background-color: #d0e7ff; margin:2px; padding:2px; }
 .반차 { background-color: #fff2cc; margin:2px; padding:2px; }
 </style>
@@ -67,10 +63,9 @@ function render(data=[]) {
           `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
 
         let items = data
-          .map((d, idx) => ({...d, idx}))
-          .filter(d => d.date.includes(fullDate))
+          .filter(d => d.date.toString().slice(0,10) === fullDate)
           .map(d => `
-            <div class="${d.type}" onclick="del(${d.idx})">
+            <div class="${d.type}" onclick="event.stopPropagation(); del(${d.index})">
               ${d.name}(${d.type})
             </div>
           `)
@@ -110,7 +105,13 @@ function add(date) {
 }
 
 function del(index) {
-  alert("삭제 기능은 현재 서버에 반영되지 않습니다 (데모용)");
+  if (!confirm("삭제하시겠습니까?")) return;
+
+  fetch('/delete', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({index})
+  }).then(load);
 }
 
 function prevMonth() {
