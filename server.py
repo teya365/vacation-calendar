@@ -4,13 +4,13 @@ import os
 
 app = Flask(__name__)
 
-API_URL = "https://script.google.com/macros/s/AKfycbyrUQjHLgpo6aminWudHWfbR3eztVV1ehUpPYAIGGC7CtHwhTGqf6TIc27PYE4Qv-55/exec"
+API_URL = "https://script.google.com/macros/s/AKfycbwZBl6Ke-c9qDEBUXNgOe44zEWUzIb04oB_fcersZgQ-YW3pNkvxUBkq7KPp51T1x8I/exec"
 
 @app.route('/')
 def home():
     return send_from_directory('.', 'index.html')
 
-# ✅ 데이터 추가
+# ✅ 추가
 @app.route('/add', methods=['POST'])
 def add():
     data = request.json
@@ -23,7 +23,18 @@ def add():
 
     return 'ok'
 
-# ✅ 데이터 조회
+# ✅ 삭제
+@app.route('/delete', methods=['POST'])
+def delete():
+    idx = request.json.get("index")
+
+    requests.get(API_URL, params={
+        "delete": idx
+    })
+
+    return 'ok'
+
+# ✅ 조회
 @app.route('/list')
 def list_data():
     res = requests.get(API_URL)
