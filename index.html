@@ -4,14 +4,23 @@
 <meta charset="UTF-8">
 <title>휴가 달력</title>
 <style>
+body { font-family: sans-serif; }
+
 table { border-collapse: collapse; }
 td, th {
   border: 1px solid #ccc;
   width: 120px;
-  height: 80px;
+  height: 100px;
   vertical-align: top;
+  padding: 5px;
 }
+th { background: #f0f0f0; }
+
 .day { font-weight: bold; }
+
+/* 색상 */
+.연차 { background-color: #d0e7ff; margin:2px; padding:2px; }
+.반차 { background-color: #fff2cc; margin:2px; padding:2px; }
 </style>
 </head>
 <body>
@@ -58,8 +67,13 @@ function render(data=[]) {
           `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
 
         let items = data
+          .map((d, idx) => ({...d, idx}))
           .filter(d => d.date.includes(fullDate))
-          .map(d => `<div>${d.name}(${d.type})</div>`)
+          .map(d => `
+            <div class="${d.type}" onclick="del(${d.idx})">
+              ${d.name}(${d.type})
+            </div>
+          `)
           .join('');
 
         html += `<td onclick="add('${fullDate}')">
@@ -85,7 +99,7 @@ function add(date) {
   const name = prompt("이름");
   if (!name) return;
 
-  const type = prompt("연차/반차");
+  const type = prompt("연차 / 반차");
   if (!type) return;
 
   fetch('/add', {
@@ -93,6 +107,10 @@ function add(date) {
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({name, date, type})
   }).then(load);
+}
+
+function del(index) {
+  alert("삭제 기능은 현재 서버에 반영되지 않습니다 (데모용)");
 }
 
 function prevMonth() {
