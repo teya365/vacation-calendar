@@ -4,8 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# ✅ 본인 Apps Script URL
-API_URL = "https://script.google.com/macros/s/AKfycbwfDEWx_lpPlJK3jJZdnrzcUaQi21oogv_Ytqs4cs8M5bv8Gbf77fdsqYkxzXDePTCfPg/exec"
+API_URL = "https://script.google.com/macros/s/AKfycbxN4e2qVbIw5m3FLkaVVb8_mzj3vdtxQCGGloC0n7s_4b7ud1HxfoK_7zmYvPM_DCmi/exec"
 
 @app.route('/')
 def home():
@@ -15,9 +14,8 @@ def home():
 @app.route('/add', methods=['POST'])
 def add():
     data = request.json
-    
-    # ✅ Apps Script는 form 방식이 안정적
-    requests.post(API_URL, data={
+
+    requests.get(API_URL, params={
         "name": data.get("name"),
         "date": data.get("date"),
         "type": data.get("type")
@@ -25,12 +23,11 @@ def add():
 
     return 'ok'
 
-# ✅ 데이터 조회 (구글시트 → 사이트)
+# ✅ 데이터 조회
 @app.route('/list')
 def list_data():
     res = requests.get(API_URL)
     return jsonify(res.json())
 
-# ✅ Render용 실행
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
