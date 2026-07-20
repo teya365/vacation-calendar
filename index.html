@@ -37,7 +37,7 @@ function load() {
     .then(data => {
       let html = '';
       data.forEach(d => {
-        html += `<p>${d.name} / ${d.date} / ${d.type}</p>`;
+        html += `<p>${d.name} / ${d.date.toString().slice(0,10)} / ${d.type}</p>`;
       });
       document.getElementById('list').innerHTML = html;
     });
