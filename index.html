@@ -1,129 +1,48 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>휴가 달력</title>
-<style>
-body { font-family: sans-serif; }
-table { border-collapse: collapse; }
-td, th {
-  border: 1px solid #ccc;
-  width: 120px;
-  height: 90px;
-  vertical-align: top;
-  padding: 5px;
-}
-th { background: #f0f0f0; }
-.day { font-weight: bold; }
-
-/* 색상 */
-.연차 { background-color: #d0e7ff; margin:2px; padding:2px; }
-.반차 { background-color: #fff2cc; margin:2px; padding:2px; }
-</style>
+<title>휴가 관리</title>
 </head>
 <body>
 
-<h2>휴가 달력</h2>
+<h2>휴가 등록</h2>
 
-<button onclick="prevMonth()">◀</button>
-<span id="title"></span>
-<button onclick="nextMonth()">▶</button>
+이름: <input id="name"><br>
+날짜: <input id="date" type="date"><br>
+구분: <input id="type"><br>
 
-<table>
-<thead>
-<tr>
-<th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
-</tr>
-</thead>
-<tbody id="calendar"></tbody>
-</table>
+<button onclick="add()">추가</button>
+
+<hr>
+
+<div id="list"></div>
 
 <script>
-let current = new Date(2026, 6); // ✅ 2026년 7월 시작
-
-function render(data=[]) {
-  const year = current.getFullYear();
-  const month = current.getMonth();
-
-  document.getElementById('title').innerText =
-    `${year}년 ${month+1}월`;
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const lastDate = new Date(year, month+1, 0).getDate();
-
-  let html = '';
-  let date = 1;
-
-  for (let i=0; i<6; i++) {
-    html += '<tr>';
-    for (let j=0; j<7; j++) {
-      if (i===0 && j<firstDay || date>lastDate) {
-        html += '<td></td>';
-      } else {
-
-        const fullDate =
-          `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
-
-        let items = data
-          .map((d, idx) => ({...d, idx}))
-          .filter(d => d.date === fullDate)
-          .map(d => `<div class="${d.type}" onclick="del(${d.idx})">
-              ${d.name}(${d.type})
-            </div>`)
-          .join('');
-
-        html += `<td onclick="add('${fullDate}')">
-          <div class="day">${date}</div>
-          ${items}
-        </td>`;
-        date++;
-      }
-    }
-    html += '</tr>';
-  }
-
-  document.getElementById('calendar').innerHTML = html;
+function add() {
+  fetch('/add', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name: name.value,
+      date: date.value,
+      type: type.value
+    })
+  }).then(load);
 }
 
 function load() {
   fetch('/list')
-    .then(r => r.json())
-    .then(data => render(data));
+    .then(res => res.json())
+    .then(data => {
+      let html = '';
+      data.forEach(d => {
+        html += `<p>${d.name} / ${d.date} / ${d.type}</p>`;
+      });
+      document.getElementById('list').innerHTML = html;
+    });
 }
 
-function add(date) {
-  const name = prompt("이름");
-  if (!name) return;
-
-  const type = prompt("연차 / 반차");
-  if (!type) return;
-
-  fetch('/add', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({name, date, type})
-  }).then(load);
-}
-
-function del(index) {
-  fetch('/delete', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({index})
-  }).then(load);
-}
-
-function prevMonth() {
-  current.setMonth(current.getMonth()-1);
-  load();
-}
-
-function nextMonth() {
-  current.setMonth(current.getMonth()+1);
-  load();
-}
-
-setInterval(load, 2000);
 load();
 </script>
 
